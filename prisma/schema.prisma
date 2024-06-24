@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Schools {
+  EACH
+  ECA
+  EEFE
+  EE
+  Poli
+  FAU
+  FCF
+  FD
+  FEA
+  FE
+  FFLCH
+  FM
+  FMVZ
+  FO
+  FSP
+  IAG
+  IB
+  ICB
+  IEE
+  IEA
+  IEB
+  IF
+  IGc
+  IME
+  IMT
+  IP
+  IQ
+  IRI
+  IIO
+}
+
+model User {
+  id              String   @id @default(cuid())
+  name            String
+  email           String   @unique
+  password        String
+  school          Schools
+  nusp            Int
+  phone           String   @unique
+  cpf             String   @unique
+  latidude        String?
+  longitude       String?
+  sentMatches     Match[]  @relation("SentMatches")
+  receivedMatches Match[]  @relation("ReceivedMatches")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Match {
+  id                String   @id @default(cuid())
+  matchFirstUser    User     @relation("SentMatches", fields: [matchFirstUserId], references: [id])
+  matchFirstUserId  String
+  matchSecondUser   User     @relation("ReceivedMatches", fields: [matchSecondUserId], references: [id])
+  matchSecondUserId String
+  matchedAt         DateTime @default(now())
+
+  @@unique([matchFirstUserId, matchSecondUserId])
+}
